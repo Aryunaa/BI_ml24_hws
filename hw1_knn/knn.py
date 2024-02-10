@@ -137,6 +137,13 @@ class KNNClassifier:
         n_train = distances.shape[1]
         n_test = distances.shape[0]
         prediction = np.zeros(n_test)
+        mins_dists_indexes = min_indices_along_rows(distances, self.k) # for each row (test)
+        for i in range(n_test): # по всем строкам (test)
+            min_dist_indexes = mins_dists_indexes[i]
+            k_vector = self.train_y[min_dist_indexes] # вектор из трейнов для теста
+            prediction[i] = most_frequent_value(k_vector)
+
+        return prediction
 
         
 
@@ -161,3 +168,18 @@ class KNNClassifier:
         YOUR CODE IS HERE
         """
         pass
+
+
+def min_indices_along_rows(matrix, n):
+    # Находим порядок элементов, отсортированных по каждой строке
+    sorted_indices = np.argsort(matrix, axis=1)
+    # Берем первые n индексов из каждой строки (т.е. индексы минимальных значений)
+    #min_indices = sorted_indices[:, :n]
+    return sorted_indices
+
+def most_frequent_value(binary_vector):
+    # Подсчет частоты каждого значения в бинарном векторе
+    counts = np.bincount(binary_vector)
+    # Нахождение индекса наиболее частого значения
+    most_frequent_index = np.argmax(counts)
+    return most_frequent_index
