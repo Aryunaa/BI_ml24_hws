@@ -54,11 +54,19 @@ class KNNClassifier:
         distances, np array (num_test_samples, num_train_samples) - array
            with distances between each test and each train sample
         """
+        test = X
+        num_test = test.shape[0]
+        num_train = self.train_X.shape[0]
+        distances = np.zeros((num_test, num_train))
         
-        """
-        YOUR CODE IS HERE
-        """
-        pass
+        # Для каждого изображения из теста
+        for i in range(num_test):
+            # для каждого изображения из трейна
+            for j in range(num_train):
+                # Вычисляем расстояние Манхэттена между i-м изображении из test и j-м изображением из train
+                distances[i, j] = np.sum(np.abs(test[i] - self.train_X[j]))
+
+        return distances
 
 
     def compute_distances_one_loop(self, X):
@@ -73,11 +81,21 @@ class KNNClassifier:
         distances, np array (num_test_samples, num_train_samples) - array
            with distances between each test and each train sample
         """
+        test = X
+        num_test = test.shape[0]
+        num_train = self.train_X.shape[0]
+        distances = np.zeros((num_test, num_train))
+        # Для каждого изображения из теста
+        for i in range(num_test):
+            # Для каждого изображения из теста вычисляем абсолютную разницу с каждым изображением из трейна,
+            # а затем суммируем значения  для каждого элемента трейна
+            #  (получаем вектор расстояний между i изображением и j изображением , вектор с размером num_train)
 
-        """
-        YOUR CODE IS HERE
-        """
-        pass
+
+            #distances[i] содержит расстояния Манхэттена между test[i] и всеми векторами из тренировочной выборки
+            distances[i] = np.sum(np.abs(test[i] - self.train_X), axis=1)
+
+        return distances       
 
 
     def compute_distances_no_loops(self, X):
@@ -96,7 +114,12 @@ class KNNClassifier:
         """
         YOUR CODE IS HERE
         """
-        pass
+        
+        test = X
+        
+        #distances = np.sum(np.abs(test - self.train_X))
+        distances = np.sum(np.abs(test[:, np.newaxis, :] - self.train_X), axis=2)
+        return distances
 
 
     def predict_labels_binary(self, distances):
@@ -115,10 +138,7 @@ class KNNClassifier:
         n_test = distances.shape[0]
         prediction = np.zeros(n_test)
 
-        """
-        YOUR CODE IS HERE
-        """
-        pass
+        
 
 
     def predict_labels_multiclass(self, distances):
