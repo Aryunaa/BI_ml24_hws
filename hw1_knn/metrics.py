@@ -16,10 +16,19 @@ def binary_classification_metrics(y_pred, y_true):
     # https://en.wikipedia.org/wiki/Precision_and_recall
     # https://en.wikipedia.org/wiki/F1_score
 
-    """
-    YOUR CODE IS HERE
-    """
-    pass
+
+    tp = np.sum((y_pred == 1) & (y_true == 1))
+    fp = np.sum((y_pred == 1) & (y_true == 0))
+    tn = np.sum((y_pred == 0) & (y_true == 0))
+    fn = np.sum((y_pred == 0) & (y_true == 1))
+
+
+    precision = tp / (tp + fp) if tp + fp > 0 else 0 # специфичность
+    recall = tp / (tp + fn) if tp + fn > 0 else 0 # чувствительность
+    f1 = 2 * (precision * recall) / (precision + recall) if precision + recall > 0 else 0
+    accuracy = (tp + tn) / (tp + fp + tn + fn)
+
+    return precision, recall, f1, accuracy
 
 
 def multiclass_accuracy(y_pred, y_true):
@@ -32,10 +41,12 @@ def multiclass_accuracy(y_pred, y_true):
     accuracy - ratio of accurate predictions to total samples
     """
 
-    """
-    YOUR CODE IS HERE
-    """
-    pass
+    true_val = np.sum(y_pred == y_true )
+    false_val = np.sum(y_pred != y_true )
+    accuracy = true_val / (true_val + false_val) if true_val + false_val > 0 else 0
+
+    return accuracy
+    
 
 
 def r_squared(y_pred, y_true):

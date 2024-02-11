@@ -1,5 +1,6 @@
 import numpy as np
-
+from collections import Counter
+import random
 
 class KNNClassifier:
     """
@@ -15,7 +16,7 @@ class KNNClassifier:
         self.train_y = y
 
 
-    def predict(self, X, n_loops=0):
+    def predict(self, X, n_loops=1):
         """
         Uses the KNN model to predict clases for the data samples provided
         
@@ -32,7 +33,7 @@ class KNNClassifier:
         if n_loops == 0:
             distances = self.compute_distances_no_loops(X)
         elif n_loops == 1:
-            distances = self.compute_distances_one_loops(X)
+            distances = self.compute_distances_one_loop(X)
         else:
             distances = self.compute_distances_two_loops(X)
         
@@ -133,8 +134,6 @@ class KNNClassifier:
         pred, np array of bool (num_test_samples) - binary predictions 
            for every test sample
         """
-
-        n_train = distances.shape[1]
         n_test = distances.shape[0]
         prediction = np.zeros(n_test)
         mins_dists_indexes = min_indices_along_rows(distances, self.k) # for each row (test)
@@ -145,9 +144,7 @@ class KNNClassifier:
 
         return prediction
 
-        
-
-
+    
     def predict_labels_multiclass(self, distances):
         """
         Returns model predictions for multi-class classification case
@@ -160,14 +157,41 @@ class KNNClassifier:
            for every test sample
         """
 
-        n_train = distances.shape[0]
+        
         n_test = distances.shape[0]
-        prediction = np.zeros(n_test, np.int)
+        prediction = np.empty(n_test)
+        mins_dists_indexes = min_indices_along_rows(distances, self.k) # for each row (test)
+        for i in range(n_test): # по всем строкам (test)
+            min_dist_indexes = mins_dists_indexes[i]
+            k_vector = self.train_y[min_dist_indexes] # вектор из трейнов для теста
 
-        """
-        YOUR CODE IS HERE
-        """
-        pass
+            # Подсчет частоты каждого значения в векторе
+            counts = Counter(k_vector)
+            # Нахождение наиболее частого значения
+            #print(counts)
+            most_common_values = counts.most_common()
+            #print(most_common_values)
+            most_frequent_value, highest_frequency = most_common_values[0]
+            
+            if len(counts) > 1 and counts.most_common()[0][1] == counts.most_common()[1][1]:
+                # Собираем все самые частые значения с одинаковой частотой
+                most_frequent_values = [value for value, count in counts.items() if count == highest_frequency]
+                # Возвращаем случайное значение из этого набора
+                #print(most_common_values)
+                most_frequent_value = random.choice(most_frequent_values)    
+                #print(most_frequent_value)
+            #print(type(most_frequent_value))
+            #print(type(prediction[i]))
+            prediction[i] = most_frequent_value
+            
+            #print('prediction = ' + str(prediction[i]))
+            #print(prediction[i])
+
+        prediction = prediction.astype('int').astype('str')  
+        #for i in range(n_test):
+             #print('prediction = ' + prediction[i])
+             #print(prediction[i])
+        return prediction
 
 
 def min_indices_along_rows(matrix, n):
@@ -175,7 +199,8 @@ def min_indices_along_rows(matrix, n):
     sorted_indices = np.argsort(matrix, axis=1)
     # Берем первые n индексов из каждой строки (т.е. индексы минимальных значений)
     #min_indices = sorted_indices[:, :n]
-    return sorted_indices
+    return sorted_indices[:,:n]
+
 
 def most_frequent_value(binary_vector):
     # Подсчет частоты каждого значения в бинарном векторе
