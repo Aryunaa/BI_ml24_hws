@@ -79,8 +79,8 @@ def mse(y_pred, y_true):
     """
 
     sum_sq_residuals = np.sum((y_true - y_pred)**2)
-    meanse = sum_sq_residuals/y_true.shape[0]
-    return meanse
+    means = sum_sq_residuals/y_true.shape[0] # corrected name
+    return means
 
 
 
